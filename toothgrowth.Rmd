@@ -1,0 +1,105 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r global_opts, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+# Statistical Inference Part - 2
+# Basic inferential data analysis
+#### *Niraj Nair*
+#### *6 June, 2020*
+
+## Assignment
+#### Now in the second portion of the project, we’re going to analyze the ToothGrowth data in the R datasets package.
+#### 1. Load the ToothGrowth data and perform some basic exploratory data analyses
+#### 2. Provide a basic summary of the data.
+#### 3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there’s other approaches worth considering)
+#### 4. State your conclusions and the assumptions needed for your conclusions.
+***
+
+## Required Packages
+```{r pack}
+library(ggplot2)
+library(dplyr)
+```
+## 1. Loading the ToothGrowth data and performing some basic exploratory data analyses.
+```{r load}
+data("ToothGrowth")
+str(ToothGrowth)
+head(ToothGrowth)
+```
+
+## 2. Obtaining a summary of the dataset.
+```{r summary}
+summary(ToothGrowth)
+g <- ggplot(data = ToothGrowth, aes(x = dose, y = len, fill = factor(dose)))
+g + geom_boxplot()+
+    facet_grid(.~supp)+
+    labs(title = "Tooth Growth from different supplements", x = "Dose", y = "Tooth Length") +
+    scale_fill_discrete(name = "Dosage")
+growth <- ToothGrowth %>% group_by(supp, dose) %>% summarise(len = mean(len))
+growth
+```
+## 3. Using confidence intervals and hypothesis tests to compare tooth growth by supp and dose.
+#### (a) We assume the null hypothesis to be that there is no relation betweem tooth growth and supp.
+```{r htest}
+OJ <- ToothGrowth$len[ToothGrowth$supp == "OJ"]
+VC <- ToothGrowth$len[ToothGrowth$supp == "VC"]
+t.test(OJ, VC, alternative = "greater", paired = FALSE, var.equal = FALSE, conf.level = .95)
+```
+#### Since the P-value is 3% ie. < 5%, we can reject the null hypothesis. This conveys that the alternative hypohtesis is accepted and therefore there exists a relation between tooth lenght and supp.
+#### (b) We assume the null hypothesis to be that there is no relation betweem tooth growth and dose.
+```{r dosePrep}
+d05 <- ToothGrowth$len[ToothGrowth$dose == .5]
+d1 <- ToothGrowth$len[ToothGrowth$dose == 1]
+d2 <- ToothGrowth$len[ToothGrowth$dose == 2]
+```
+* First we will check that if the alternative hypothesis is right for the smaller doses
+```{r doseSmall}
+t.test(d05, d1, alternative = "less", paired = FALSE, var.equal = FALSE, conf.level = .95)
+```
+* Second we will check that if the alternative hypothesis is right for the bigger doses
+```{r doseBig}
+t.test(d1, d2, alternative = "less", paired = FALSE, var.equal = FALSE, conf.level = .95)
+```
+#### From both the tests we can clearly see that the P-values are very low. Therefore the null hypothesis is rejected and we can say that the tooth growth depends on the doasage of supp.
+
+## Conclusion
+* There doesn't seem to be a statistically significant difference between delivery methods, with OJ apparently more effective at dose levels 0.5 and 1, and VC slightly more effective at dose level 2.
+
+* It appears that there is a statistically significant difference between tooth length and dose levels across both delivery methods, in other words, as the 
+dose increases so does tooth length.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
